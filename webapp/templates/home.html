@@ -1,0 +1,127 @@
+
+
+{%extends 'base.html'%}
+
+{%block body_block%}
+
+
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-4"></div>
+        <div class="col-4 text-center">
+            {%if messages%}
+                {%for msg in messages%}
+                    {% if msg.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>{{msg}}</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endif %}
+                    {% if msg.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>{{msg}}</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endif %}
+                {%endfor%}
+            {%endif%}
+        </div>
+        <div class="col-4"></div>
+    </div>
+</div>
+
+
+
+<form action="" method="POST" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3"></div>
+            <div class="col-lg-6 mb-5">
+                <p class="text-center">
+                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                        Add Post
+                    </button>
+                </p>
+                <div class="collapse" id="collapseExample">
+                    <div  class="card card-body">
+                        {%csrf_token%}
+                        {{ form.as_p }}
+                        <div class="text-center mt-4">
+                            <input type="submit" value="Post">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3"></div>
+        </div>
+    </div>
+</form>
+
+{% for p in posts%}
+<div class="container">
+    <div class="row">
+        <div class="col-2"></div>
+        <div class="col-8">
+            <div class="shadow card mb-4">
+                <div class="card-body ">
+                    <div  class="small text-muted">{{p.date|date:"d:m:Y"}}</div>
+                    <h2  class="card-title h4">{{p.title}} </h2>
+                    <h6>{{p.description}}</h6>
+                    {{p.tags}}
+                    <div class="card mt-4 border border-white">
+                        <div class="row">
+                            <div class="col-10">
+                                <form style="display: inline-block;" action="" method="post">
+                                    {%csrf_token%}
+                                    {% if request.user in p.no_of_likes.all %}
+                                    <p class="border border-white">
+                                        <a class="ms-2 fa-regular fa-heart fa-solid text-danger text-decoration-none"
+                                            href="{%url 'unlike' p.id%}"></a>
+                                        {{p.no_of_likes.all.count}} Likes
+
+                                        {%else%}
+                                    <p class="border border-white">
+                                        <a class="ms-2 fa-regular fa-heart text-dark text-decoration-none"
+                                            href="{%url 'like' p.id%}"></a>
+                                        {{p.no_of_likes.all.count}} Likes
+
+                                        {%endif%}
+                                    </p>
+                                </form>       
+                            </div>
+                            <div class="col-2">
+                                {% if request.user.id == p.user.id %}
+                                    <a href="{% url 'postdelete' p.id%}"><i class="fa-solid text-danger fa-trash-can" style='font-size:20px'></i></a>
+                                    <a href="{% url 'postupdate' p.id%}"><i class='fas fa-edit ms-2' style="color: red;font-size:20px"></i></a>
+                                {%endif%}
+                            </div>
+                        </div>
+                    </div>            
+                </div>
+            </div>
+        </div>
+        <div class="col-2"></div>
+    </div>
+</div>
+{%endfor%}
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    $(document).ready(function() {
+        $('.select2').select2();
+    });
+</script>
+
+{%endblock%}
